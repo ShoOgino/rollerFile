@@ -14,25 +14,28 @@
  * limitations under the License.
  *
  */
-package org.apache.roller.util.rome;
+package org.apache.roller.planet.util.rome;
 
-import com.sun.syndication.feed.rss.Item;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.impl.ConverterForRSS091Userland;
+import com.sun.syndication.feed.module.ModuleImpl;
 
-/**
- */
-public class PlanetConverterForRSS091N extends ConverterForRSS091Userland {
+public class ContentModuleImpl extends ModuleImpl implements ContentModule {
+    private String _encoded;
 
-    public PlanetConverterForRSS091N() {
-        this("rss_0.91N");
+    public ContentModuleImpl() {
+        super(ContentModule.class,ContentModule.URI);
     }
-    protected PlanetConverterForRSS091N(String type) {
-        super(type);
+    public String getEncoded() {
+        return _encoded;
     }
-    protected SyndEntry createSyndEntry(Item item) {
-        SyndEntry entry = super.createSyndEntry(item);
-        entry.setPublishedDate(item.getPubDate()); 
-        return entry;
+    public void setEncoded(String encoded) {
+        _encoded = encoded;
     }
+    public Class getInterface() {
+        return ContentModule.class;
+    }
+    public void copyFrom(Object obj) {
+        ContentModule sm = (ContentModule) obj;
+        setEncoded(sm.getEncoded());
+    }
+
 }

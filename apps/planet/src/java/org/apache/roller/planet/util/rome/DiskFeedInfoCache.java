@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.roller.util.rome;
+package org.apache.roller.planet.util.rome;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.sun.syndication.fetcher.impl.FeedFetcherCache;
 import com.sun.syndication.fetcher.impl.SyndFeedInfo;
-import org.apache.roller.util.Utilities;
+import org.apache.roller.planet.util.Utilities;
 
 /**
  * @author David M. Johnson

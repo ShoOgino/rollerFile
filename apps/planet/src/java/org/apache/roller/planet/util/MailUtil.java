@@ -15,7 +15,7 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.util;
+package org.apache.roller.planet.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

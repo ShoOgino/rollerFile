@@ -1,4 +1,4 @@
-package org.apache.roller.util;
+package org.apache.roller.planet.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

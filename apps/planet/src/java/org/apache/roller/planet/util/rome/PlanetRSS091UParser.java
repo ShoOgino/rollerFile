@@ -14,26 +14,32 @@
  * limitations under the License.
  *
  */
-package org.apache.roller.util.rome;
+package org.apache.roller.planet.util.rome;
+
+import org.jdom.Element;
 
 import com.sun.syndication.feed.rss.Item;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.impl.ConverterForRSS091Userland;
+import com.sun.syndication.io.impl.DateParser;
+import com.sun.syndication.io.impl.RSS091UserlandParser;
 
 /**
  */
-public class PlanetConverterForRSS091U extends ConverterForRSS091Userland {
+public class PlanetRSS091UParser extends RSS091UserlandParser {
 
-    public PlanetConverterForRSS091U() {
+    public PlanetRSS091UParser() {
         this("rss_0.91U");
     }
 
-    protected PlanetConverterForRSS091U(String type) {
+    protected PlanetRSS091UParser(String type) {
         super(type);
     }
-    protected SyndEntry createSyndEntry(Item item) {
-        SyndEntry entry = super.createSyndEntry(item);
-        entry.setPublishedDate(item.getPubDate()); 
-        return entry;
+
+    protected Item parseItem(Element rssRoot,Element eItem) {
+        Item item = super.parseItem(rssRoot, eItem);
+        Element e = eItem.getChild("pubDate",getRSSNamespace());
+        if (e!=null) {
+            item.setPubDate(DateParser.parseRFC822(e.getText()));
+        }
+        return item;
     }
 }

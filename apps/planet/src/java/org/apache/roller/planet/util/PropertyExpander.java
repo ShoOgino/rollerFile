@@ -16,7 +16,7 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.util;
+package org.apache.roller.planet.util;
 
 import java.util.Map;
 import java.util.regex.Matcher;

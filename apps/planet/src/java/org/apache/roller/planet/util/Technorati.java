@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.roller.util;
+package org.apache.roller.planet.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
