@@ -16,45 +16,30 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.planet.business;
+package org.apache.roller.planet.ui.core.struts2;
 
-import org.apache.roller.RollerException;
-import org.apache.roller.planet.business.PropertiesManager;
+import com.opensymphony.xwork2.ActionSupport;
 
 
 /**
- * The main entry point interface of the Roller business tier.
+ * Login Action.
  */
-public interface Planet {
+public class Login extends PlanetActionSupport {
     
-    /**
-     * Get PlanetManager associated with this Roller instance.
-     */
-    public PlanetManager getPlanetManager();
+    private boolean failed = false;
     
     
-    /**
-     * Get PropertiesManager.
-     */
-    public PropertiesManager getPropertiesManager();
-    
-    
-    /**
-     * Flush object states.
-     */
-    public void flush() throws RollerException;
-    
-    
-    /**
-     * Release all resources associated with Roller session.
-     */
-    public void release();
-    
-    
-    /**
-     * Release all resources necessary for this instance of Roller.
-     */
-    public void shutdown();
+    public String execute() {
+        // nothing to do right now
+        return SUCCESS;
+    }
+
+    public boolean isFailed() {
+        return failed;
+    }
+
+    public void setFailed(boolean failed) {
+        this.failed = failed;
+    }
     
 }
-

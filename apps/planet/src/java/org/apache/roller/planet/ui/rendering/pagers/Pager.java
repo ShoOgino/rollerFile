@@ -16,45 +16,47 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.planet.business;
+package org.apache.roller.planet.ui.rendering.pagers;
 
-import org.apache.roller.RollerException;
-import org.apache.roller.planet.business.PropertiesManager;
-
+import java.util.List;
 
 /**
- * The main entry point interface of the Roller business tier.
+ * Common pager interface.
  */
-public interface Planet {
+public interface Pager {
+    /**
+     * Link value for returning to pager home
+     */
+    public String getHomeLink();
+
+    /**
+     * Name of pager home.
+     */
+    public String getHomeName();
+
+    /**
+     * Link value for next page in current collection view
+     */
+    public String getNextLink();
+
+    /**
+     * Name for next page in current collection view
+     */
+    public String getNextName();
+
+    /**
+     * Link value for prev page in current collection view
+     */
+    public String getPrevLink();
+
+    /**
+     * Link value for prev page in current collection view
+     */
+    public String getPrevName();
     
     /**
-     * Get PlanetManager associated with this Roller instance.
+     * Get current list of items available from the pager.
      */
-    public PlanetManager getPlanetManager();
-    
-    
-    /**
-     * Get PropertiesManager.
-     */
-    public PropertiesManager getPropertiesManager();
-    
-    
-    /**
-     * Flush object states.
-     */
-    public void flush() throws RollerException;
-    
-    
-    /**
-     * Release all resources associated with Roller session.
-     */
-    public void release();
-    
-    
-    /**
-     * Release all resources necessary for this instance of Roller.
-     */
-    public void shutdown();
+    public List getItems();
     
 }
-

@@ -16,45 +16,44 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.planet.business;
+package org.apache.roller.planet.config.runtime;
 
-import org.apache.roller.RollerException;
-import org.apache.roller.planet.business.PropertiesManager;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
- * The main entry point interface of the Roller business tier.
+ * Represents the collection of all ConfigDefs.
  */
-public interface Planet {
+public class RuntimeConfigDefs {
     
-    /**
-     * Get PlanetManager associated with this Roller instance.
-     */
-    public PlanetManager getPlanetManager();
+    private List configDefs = null;
     
     
-    /**
-     * Get PropertiesManager.
-     */
-    public PropertiesManager getPropertiesManager();
+    public RuntimeConfigDefs() {
+        this.configDefs = new ArrayList();
+    }
+    
+    public RuntimeConfigDefs(List configs) {
+        this.configDefs = configs;
+    }
     
     
-    /**
-     * Flush object states.
-     */
-    public void flush() throws RollerException;
+    public boolean addConfigDef(ConfigDef config) {
+        return this.configDefs.add(config);
+    }
+    
+    public boolean removeConfigDef(ConfigDef config) {
+        return this.configDefs.remove(config);
+    }
     
     
-    /**
-     * Release all resources associated with Roller session.
-     */
-    public void release();
+    public List getConfigDefs() {
+        return configDefs;
+    }
     
-    
-    /**
-     * Release all resources necessary for this instance of Roller.
-     */
-    public void shutdown();
+    public void setConfigDefs(List configDefs) {
+        this.configDefs = configDefs;
+    }
     
 }
-

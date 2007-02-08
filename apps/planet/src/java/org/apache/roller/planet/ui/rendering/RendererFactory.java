@@ -16,45 +16,30 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.planet.business;
+package org.apache.roller.planet.ui.rendering;
 
-import org.apache.roller.RollerException;
-import org.apache.roller.planet.business.PropertiesManager;
+import org.apache.roller.planet.pojos.Template;
 
 
 /**
- * The main entry point interface of the Roller business tier.
+ * A factory for Renderer objects.
+ *
+ * Implementations of this interface are used to handle the actual lookup of
+ * what Renderer object should be used to render a given resource.
  */
-public interface Planet {
-    
-    /**
-     * Get PlanetManager associated with this Roller instance.
-     */
-    public PlanetManager getPlanetManager();
+public interface RendererFactory {
     
     
     /**
-     * Get PropertiesManager.
+     * Get a Renderer that will handle the given Template.
+     * If a RendererFactory does not have a Renderer which can handle the
+     * content then it may return null.
+     *
+     * This method purposely does not throw exceptions because the rendering
+     * system as a whole does not care if a given factory generates an exception
+     * while trying to find a renderer.  It is up to the factory itself to
+     * report any relevant exceptions itself.
      */
-    public PropertiesManager getPropertiesManager();
-    
-    
-    /**
-     * Flush object states.
-     */
-    public void flush() throws RollerException;
-    
-    
-    /**
-     * Release all resources associated with Roller session.
-     */
-    public void release();
-    
-    
-    /**
-     * Release all resources necessary for this instance of Roller.
-     */
-    public void shutdown();
+    public Renderer getRenderer(Template template);
     
 }
-

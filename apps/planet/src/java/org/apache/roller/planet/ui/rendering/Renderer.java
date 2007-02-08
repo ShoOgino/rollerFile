@@ -16,45 +16,24 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.planet.business;
+package org.apache.roller.planet.ui.rendering;
 
-import org.apache.roller.RollerException;
-import org.apache.roller.planet.business.PropertiesManager;
+import java.io.Writer;
+import java.util.Map;
 
 
 /**
- * The main entry point interface of the Roller business tier.
+ * Interface representing a content renderer in Roller.
  */
-public interface Planet {
-    
-    /**
-     * Get PlanetManager associated with this Roller instance.
-     */
-    public PlanetManager getPlanetManager();
+public interface Renderer {
     
     
     /**
-     * Get PropertiesManager.
+     * Render the content for this Renderer to the given Writer using
+     * the given set of model objects.
+     *
+     * Throws an exception if there is a problem during rendering.
      */
-    public PropertiesManager getPropertiesManager();
-    
-    
-    /**
-     * Flush object states.
-     */
-    public void flush() throws RollerException;
-    
-    
-    /**
-     * Release all resources associated with Roller session.
-     */
-    public void release();
-    
-    
-    /**
-     * Release all resources necessary for this instance of Roller.
-     */
-    public void shutdown();
+    public void render(Map model, Writer writer) throws RenderingException;
     
 }
-

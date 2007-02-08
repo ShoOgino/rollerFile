@@ -16,45 +16,26 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.planet.business;
+package org.apache.roller.planet.ui.rendering;
 
 import org.apache.roller.RollerException;
-import org.apache.roller.planet.business.PropertiesManager;
 
 
 /**
- * The main entry point interface of the Roller business tier.
+ * A generic Roller rendering exception.
  */
-public interface Planet {
+public class RenderingException extends RollerException {
     
-    /**
-     * Get PlanetManager associated with this Roller instance.
-     */
-    public PlanetManager getPlanetManager();
+    public RenderingException(String s) {
+        super(s);
+    }
     
+    public RenderingException(String s, Throwable t) {
+        super(s, t);
+    }
     
-    /**
-     * Get PropertiesManager.
-     */
-    public PropertiesManager getPropertiesManager();
-    
-    
-    /**
-     * Flush object states.
-     */
-    public void flush() throws RollerException;
-    
-    
-    /**
-     * Release all resources associated with Roller session.
-     */
-    public void release();
-    
-    
-    /**
-     * Release all resources necessary for this instance of Roller.
-     */
-    public void shutdown();
+    public RenderingException(Throwable t) {
+        super(t);
+    }
     
 }
-

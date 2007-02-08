@@ -16,45 +16,23 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.planet.business;
+package org.apache.roller.planet.ui.rendering.util;
 
 import org.apache.roller.RollerException;
-import org.apache.roller.planet.business.PropertiesManager;
 
 
 /**
- * The main entry point interface of the Roller business tier.
+ * An InvalidRequestException is thrown by the ParsedRequest class or any of
+ * its subclasses when the request being parsed is invalid in any way.
  */
-public interface Planet {
+public class InvalidRequestException extends RollerException {
     
-    /**
-     * Get PlanetManager associated with this Roller instance.
-     */
-    public PlanetManager getPlanetManager();
+    public InvalidRequestException(String msg) {
+        super(msg);
+    }
     
-    
-    /**
-     * Get PropertiesManager.
-     */
-    public PropertiesManager getPropertiesManager();
-    
-    
-    /**
-     * Flush object states.
-     */
-    public void flush() throws RollerException;
-    
-    
-    /**
-     * Release all resources associated with Roller session.
-     */
-    public void release();
-    
-    
-    /**
-     * Release all resources necessary for this instance of Roller.
-     */
-    public void shutdown();
+    public InvalidRequestException(String msg, Exception e) {
+        super(msg, e);
+    }
     
 }
-
