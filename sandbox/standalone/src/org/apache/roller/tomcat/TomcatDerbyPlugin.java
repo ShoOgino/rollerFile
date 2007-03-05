@@ -18,20 +18,41 @@
 
 package org.apache.roller.tomcat;
 
+import java.io.PrintWriter;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
-import org.apache.roller.util.HSQLDBUtility;
+import org.apache.derby.drda.NetworkServerControl;
 
-public class TomcatHSQLDBPlugin implements LifecycleListener {
+public class TomcatDerbyPlugin implements LifecycleListener {
 	
 	public void lifecycleEvent(LifecycleEvent event) {	
 		
 		if (event.getType().equals(Lifecycle.START_EVENT)) {
-			HSQLDBUtility.start();
+            Thread server = new Thread() {
+                public void run() {
+                    try {
+                        System.out.println("Starting Derby");
+                        NetworkServerControl server = new NetworkServerControl();
+                        server.start(new PrintWriter(System.out));
+                    } catch (Exception e) {
+                        System.out.println("ERROR staring up Derby");
+                        e.printStackTrace();
+                    }
+                }
+            };
+            server.start();
 		}
 		else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
-			HSQLDBUtility.stop();
+            try {
+                System.out.println("Stopping Derby");
+                NetworkServerControl server = new NetworkServerControl();
+                server.shutdown();
+                try {Thread.sleep(2000);} catch (Exception ignored) {}
+            } catch (Exception e) {
+                System.out.println("ERROR shutting down Derby");
+                e.printStackTrace();
+            }
             
             // This is drastic, but 
             // 1) we really want Tomcat to stop and 
