@@ -21,10 +21,10 @@
  * Created on January 17, 2006, 12:44 PM
  */
 
-package org.apache.roller.webservices.adminapi.sdk;
+package org.apache.roller.webservices.adminprotocol.sdk;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,26 +32,27 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.apache.roller.webservices.adminapi.sdk.EntrySet.Types;
+import org.apache.roller.webservices.adminprotocol.sdk.EntrySet.Types;
 
 /**
- * This class describes a set of weblog entries. 
+ * This class describes a set of member entries. 
+ *
  * @author jtb
  */
-public class WeblogEntrySet extends EntrySet {
+public class MemberEntrySet extends EntrySet {
     static interface Tags {
-        public static final String WEBLOGS = "weblogs";
-    }      
-    
-    public WeblogEntrySet(String urlPrefix) {
-        setHref(urlPrefix + "/" + Types.WEBLOGS);
-    }
-    
-    public WeblogEntrySet(Document d, String urlPrefix) throws UnexpectedRootElementException {
+        public static final String MEMBERS = "members";
+    }       
+        
+    public MemberEntrySet(String urlPrefix) {
+        setHref(urlPrefix + "/" + Types.MEMBERS);        
+    }    
+
+    public MemberEntrySet(Document d, String urlPrefix) throws UnexpectedRootElementException {
         populate(d, urlPrefix);
     }
     
-    public WeblogEntrySet(InputStream stream, String urlPrefix) throws JDOMException, IOException, UnexpectedRootElementException {               
+    public MemberEntrySet(InputStream stream, String urlPrefix) throws JDOMException, IOException, UnexpectedRootElementException {               
         SAXBuilder sb = new SAXBuilder();
         Document d = sb.build(stream);
 
@@ -61,23 +62,23 @@ public class WeblogEntrySet extends EntrySet {
     private void populate(Document d, String urlPrefix) throws UnexpectedRootElementException {
         Element root = d.getRootElement();
         String rootName = root.getName();
-        if (!rootName.equals(Tags.WEBLOGS)) {
-            throw new UnexpectedRootElementException("ERROR: Unexpected root element", Tags.WEBLOGS, rootName);
+        if (!rootName.equals(Tags.MEMBERS)) {
+            throw new UnexpectedRootElementException("ERROR: Incorrect root element", Tags.MEMBERS, rootName);
         }
-        List weblogs = root.getChildren(WeblogEntry.Tags.WEBLOG, Service.NAMESPACE);
-        if (weblogs != null) {
+        List members = root.getChildren(MemberEntry.Tags.MEMBER, NAMESPACE);
+        if (members != null) {
             List entries = new ArrayList();
-            for (Iterator i = weblogs.iterator(); i.hasNext(); ) {
-                Element weblog = (Element)i.next();
-                WeblogEntry entry = new WeblogEntry(weblog, urlPrefix);
+            for (Iterator i = members.iterator(); i.hasNext(); ) {
+                Element member = (Element)i.next();
+                MemberEntry entry = new MemberEntry(member, urlPrefix);
                 entries.add(entry);
             }
             setEntries((Entry[])entries.toArray(new Entry[0]));
         }
-        setHref(urlPrefix + "/" + Types.WEBLOGS);
-    }    
-       
+        setHref(urlPrefix + "/" + Types.MEMBERS);
+    }
+        
     public String getType() {
-        return Types.WEBLOGS;
+        return Types.MEMBERS;
     }    
 }

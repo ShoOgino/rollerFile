@@ -16,7 +16,7 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import java.io.Reader;
 import java.net.MalformedURLException;
@@ -38,11 +38,11 @@ import org.apache.roller.pojos.UserData;
 import org.apache.roller.pojos.WebsiteData;
 import org.apache.roller.util.cache.CacheManager;
 import org.apache.roller.util.Utilities;
-import org.apache.roller.webservices.adminapi.sdk.Entry;
-import org.apache.roller.webservices.adminapi.sdk.EntrySet;
-import org.apache.roller.webservices.adminapi.sdk.UnexpectedRootElementException;
-import org.apache.roller.webservices.adminapi.sdk.WeblogEntry;
-import org.apache.roller.webservices.adminapi.sdk.WeblogEntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.Entry;
+import org.apache.roller.webservices.adminprotocol.sdk.EntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.UnexpectedRootElementException;
+import org.apache.roller.webservices.adminprotocol.sdk.WeblogEntry;
+import org.apache.roller.webservices.adminprotocol.sdk.WeblogEntrySet;
 
 /**
  * This class handles requests concerning Roller weblog resources.

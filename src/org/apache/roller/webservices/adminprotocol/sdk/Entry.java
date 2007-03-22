@@ -15,7 +15,7 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi.sdk;
+package org.apache.roller.webservices.adminprotocol.sdk;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -31,7 +31,7 @@ import org.jdom.output.XMLOutputter;
  * Weblog resources are represented by sets of entries.
  */
 public abstract class Entry {
-    protected static final Namespace NAMESPACE = Namespace.getNamespace("http://purl.org/apache/roller/aapp#");
+    protected static final Namespace NAMESPACE = Namespace.getNamespace("http://purl.org/apache/roller/rap#");
     
     /** Entry types. */
     public static interface Types {

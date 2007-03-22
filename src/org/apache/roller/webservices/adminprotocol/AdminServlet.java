@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,19 +28,18 @@ import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
-import org.apache.roller.webservices.adminapi.sdk.EntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.EntrySet;
 
 /**
  * Atom Admin Servlet implements the Atom Admin endpoint.
  * This servlet simply delegates work to a particular handler object.
- *
- * @web.servlet name="AtomAdminServlet"
- * @web.servlet-mapping url-pattern="/roller-services/aapp/*"
- *
+ * 
  * @author jtb
+ * @web.servlet name="AdminServlet"
+ * @web.servlet-mapping url-pattern="/roller-services/rap/*"
  */
-public class AtomAdminServlet extends HttpServlet {
-    private static Log logger = LogFactory.getFactory().getInstance(AtomAdminServlet.class);
+public class AdminServlet extends HttpServlet {
+    private static Log logger = LogFactory.getFactory().getInstance(AdminServlet.class);
     
     /**
      * Handles an Atom GET by calling handler and writing results to response.

@@ -15,20 +15,24 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Indicates to client that an internal error occured when processing
- * the request.
+ * Indicates to client that a bad (syntactically incorrect)
+ * request has been made.
  */
-public class UnauthorizedException extends HandlerException { 
-    public UnauthorizedException(String msg) {
+public class BadRequestException extends HandlerException { 
+    public BadRequestException(String msg) {
         super(msg);
     }    
     
+    public BadRequestException(String msg, Throwable t) {
+        super(msg, t);
+    }    
+
     public int getStatus() {
-        return HttpServletResponse.SC_UNAUTHORIZED;
+        return HttpServletResponse.SC_BAD_REQUEST;
     }
 }

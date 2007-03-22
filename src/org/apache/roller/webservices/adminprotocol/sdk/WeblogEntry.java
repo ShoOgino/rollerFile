@@ -15,7 +15,7 @@
  * copyright in this work, please see the NOTICE file in the top level
  * directory of this distribution.
  */
-package org.apache.roller.webservices.adminapi.sdk;
+package org.apache.roller.webservices.adminprotocol.sdk;
 /*
  * WeblogEntry.java
  *
@@ -32,8 +32,8 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
-import org.apache.roller.webservices.adminapi.sdk.Entry.Attributes;
-import org.apache.roller.webservices.adminapi.sdk.Entry.Types;
+import org.apache.roller.webservices.adminprotocol.sdk.Entry.Attributes;
+import org.apache.roller.webservices.adminprotocol.sdk.Entry.Types;
 
 /**
  * This class describes a weblog entry.

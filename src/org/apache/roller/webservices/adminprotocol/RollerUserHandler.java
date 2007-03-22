@@ -15,7 +15,7 @@
  * copyright in this work, please see the NOTICE file in the top level
  * directory of this distribution.
  */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -29,11 +29,11 @@ import org.apache.roller.RollerException;
 import org.apache.roller.business.UserManager;
 import org.apache.roller.pojos.UserData;
 import org.apache.roller.util.cache.CacheManager;
-import org.apache.roller.webservices.adminapi.sdk.Entry;
-import org.apache.roller.webservices.adminapi.sdk.EntrySet;
-import org.apache.roller.webservices.adminapi.sdk.UnexpectedRootElementException;
-import org.apache.roller.webservices.adminapi.sdk.UserEntry;
-import org.apache.roller.webservices.adminapi.sdk.UserEntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.Entry;
+import org.apache.roller.webservices.adminprotocol.sdk.EntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.UnexpectedRootElementException;
+import org.apache.roller.webservices.adminprotocol.sdk.UserEntry;
+import org.apache.roller.webservices.adminprotocol.sdk.UserEntrySet;
 
 /**
  * This class handles request concerning Roller users.

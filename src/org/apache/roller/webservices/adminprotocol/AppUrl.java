@@ -15,7 +15,7 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import java.net.MalformedURLException;
 import java.net.URL;

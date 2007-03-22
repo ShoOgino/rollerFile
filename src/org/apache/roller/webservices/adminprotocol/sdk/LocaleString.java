@@ -15,7 +15,7 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi.sdk;
+package org.apache.roller.webservices.adminprotocol.sdk;
 
 import java.util.Locale;
 

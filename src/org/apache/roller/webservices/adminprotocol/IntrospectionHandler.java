@@ -15,21 +15,21 @@
  * copyright in this work, please see the NOTICE file in the top level
  * directory of this distribution.
  */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.roller.webservices.adminapi.sdk.Entry;
-import org.apache.roller.webservices.adminapi.sdk.EntrySet;
-import org.apache.roller.webservices.adminapi.sdk.Service;
-import org.apache.roller.webservices.adminapi.sdk.UnexpectedRootElementException;
+import org.apache.roller.webservices.adminprotocol.sdk.Entry;
+import org.apache.roller.webservices.adminprotocol.sdk.EntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.Service;
+import org.apache.roller.webservices.adminprotocol.sdk.UnexpectedRootElementException;
 import org.jdom.Document;
 
 /**
- * This class handles requests for the AAPP introspection document.
+ * This class handles requests for the RAP introspection document.
  * It only processes HTTP GET requests.
  *
  * @author jtb
@@ -76,20 +76,20 @@ class IntrospectionHandler extends Handler {
         
         Service.Workspace.Collection weblogCol = new Service.Workspace.Collection();
         weblogCol.setTitle("Collection: Weblog administration entries");
-        weblogCol.setMemberType(org.apache.roller.webservices.adminapi.sdk.Entry.Types.WEBLOG);
-        weblogCol.setHref(service.getHref() + "/" + org.apache.roller.webservices.adminapi.sdk.EntrySet.Types.WEBLOGS);
+        weblogCol.setMemberType(org.apache.roller.webservices.adminprotocol.sdk.Entry.Types.WEBLOG);
+        weblogCol.setHref(service.getHref() + "/" + org.apache.roller.webservices.adminprotocol.sdk.EntrySet.Types.WEBLOGS);
         workspaceCollections.add(weblogCol);
         
         Service.Workspace.Collection userCol = new Service.Workspace.Collection();
         userCol.setTitle("Collection: User administration entries");
         userCol.setMemberType("user");
-        userCol.setHref(service.getHref() + "/" + org.apache.roller.webservices.adminapi.sdk.EntrySet.Types.USERS);
+        userCol.setHref(service.getHref() + "/" + org.apache.roller.webservices.adminprotocol.sdk.EntrySet.Types.USERS);
         workspaceCollections.add(userCol);
         
         Service.Workspace.Collection memberCol = new Service.Workspace.Collection();
         memberCol.setTitle("Collection: Member administration entries");
         memberCol.setMemberType("member");
-        memberCol.setHref(service.getHref() + "/" + org.apache.roller.webservices.adminapi.sdk.EntrySet.Types.MEMBERS);
+        memberCol.setHref(service.getHref() + "/" + org.apache.roller.webservices.adminprotocol.sdk.EntrySet.Types.MEMBERS);
         workspaceCollections.add(memberCol);
         
         workspace.setEntries((Entry[])workspaceCollections.toArray(new Entry[0]));

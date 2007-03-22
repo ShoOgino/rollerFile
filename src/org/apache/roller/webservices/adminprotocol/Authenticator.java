@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import javax.servlet.http.HttpServletRequest;
 import org.apache.roller.RollerException;
@@ -56,7 +56,7 @@ abstract class Authenticator {
         }
         
         if (!ud.hasRole("admin")) {
-            throw new UnauthorizedException("ERROR: User must have the admin role to use the AAPP endpoint: " + userName);
+            throw new UnauthorizedException("ERROR: User must have the admin role to use the RAP endpoint: " + userName);
         }
         if (!ud.getEnabled().booleanValue()) {
             throw new UnauthorizedException("ERROR: User is disabled: " + userName);

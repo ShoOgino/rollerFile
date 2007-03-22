@@ -15,7 +15,7 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi.sdk;
+package org.apache.roller.webservices.adminprotocol.sdk;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +52,7 @@ public abstract class EntrySet extends Entry {
           * Set of workspace entries.
           * This type, along with WORKSPACE and COLLECTION, define
           * the element that describe the introspection document
-          * for the AAPP service.
+          * for the RAP service.
           * <p>
           * A service is a set of workspaces, and a workspace is a set of 
           * collections.

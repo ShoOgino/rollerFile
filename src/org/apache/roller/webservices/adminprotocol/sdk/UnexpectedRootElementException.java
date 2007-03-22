@@ -15,20 +15,19 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol.sdk;
 
-import javax.servlet.http.HttpServletResponse;
-
-/**
- * Indicates to client that they are not allows to perform the requested
- * operation on the requested resource.
- */
-public class NotAllowedException extends HandlerException { 
-    public NotAllowedException(String msg) {
-        super(msg);
-    }    
+public class UnexpectedRootElementException extends Exception {
+    private String expected;
+    private String actual;
     
-    public int getStatus() {
-        return HttpServletResponse.SC_METHOD_NOT_ALLOWED;
+    public UnexpectedRootElementException(String msg, String expected, String actual) {
+        super(msg);
+        this.expected = expected;
+        this.actual = actual;
     }
+    
+    public String getMessage() {
+        return super.getMessage() + ": expected root element:  " + expected + ", was: " + actual;
+    }    
 }

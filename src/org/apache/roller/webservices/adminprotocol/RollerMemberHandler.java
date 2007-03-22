@@ -15,7 +15,7 @@
  * copyright in this work, please see the NOTICE file in the top level
  * directory of this distribution.
  */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -32,11 +32,11 @@ import org.apache.roller.pojos.PermissionsData;
 import org.apache.roller.pojos.UserData;
 import org.apache.roller.pojos.WebsiteData;
 import org.apache.roller.util.cache.CacheManager;
-import org.apache.roller.webservices.adminapi.sdk.Entry;
-import org.apache.roller.webservices.adminapi.sdk.EntrySet;
-import org.apache.roller.webservices.adminapi.sdk.MemberEntry;
-import org.apache.roller.webservices.adminapi.sdk.MemberEntrySet;
-import org.apache.roller.webservices.adminapi.sdk.UnexpectedRootElementException;
+import org.apache.roller.webservices.adminprotocol.sdk.Entry;
+import org.apache.roller.webservices.adminprotocol.sdk.EntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.MemberEntry;
+import org.apache.roller.webservices.adminprotocol.sdk.MemberEntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.UnexpectedRootElementException;
 
 /**
  * This class handles requests concerning Roller weblog membership (groups).

@@ -15,7 +15,7 @@
  * copyright in this work, please see the NOTICE file in the top level
  * directory of this distribution.
  */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -26,7 +26,7 @@ import org.apache.roller.config.RollerConfig;
 import org.apache.roller.business.Roller;
 import org.apache.roller.business.RollerFactory;
 import org.apache.roller.ui.core.RollerContext;
-import org.apache.roller.webservices.adminapi.sdk.EntrySet;
+import org.apache.roller.webservices.adminprotocol.sdk.EntrySet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.apache.roller.RollerException;
@@ -34,18 +34,18 @@ import org.apache.roller.config.RollerRuntimeConfig;
 import org.apache.roller.business.UserManager;
 import org.apache.roller.pojos.UserData;
 import org.apache.roller.pojos.WebsiteData;
-import org.apache.roller.webservices.adminapi.sdk.UnexpectedRootElementException;
+import org.apache.roller.webservices.adminprotocol.sdk.UnexpectedRootElementException;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
- * This class is the abstract notion of an AAPP request handler.
+ * This class is the abstract notion of an RAP request handler.
  * It processes HTTP requests for each of the four HTTP verbs:
  * GET, POST, PUT, DELETE, for a given weblog resource.
  */
 abstract class Handler {
-    protected static final String ENDPOINT = "/aapp";
+    protected static final String ENDPOINT = "/rap";
     
     static class URI {
         private static Pattern PATHINFO_PATTERN = Pattern.compile("^/(users|weblogs|members)(?:/(.*))?$");

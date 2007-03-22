@@ -15,27 +15,20 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * Abstract base class for all handler exceptions.
- *
- * Subclasses of this class allow handler implementations to indicate to
- * callers a particular HTTP error type, while still providing
- * a textual description of the problem.
- * 
- * Callers may use the 
- * <code>getStatus()</code> method to discover the HTTP status
- * code that should be returned to the client.
+ * Indicates to client that an internal error occured when processing
+ * the request.
  */
-public abstract class HandlerException extends Exception { 
-    public HandlerException(String msg) {
-        super(msg);
-    }    
-
-    public HandlerException(String msg, Throwable t) {
+public class UnauthorizedException extends HandlerException { 
+    public UnauthorizedException(String msg) {
         super(msg);
     }    
     
-    public abstract int getStatus();
+    public int getStatus() {
+        return HttpServletResponse.SC_UNAUTHORIZED;
+    }
 }

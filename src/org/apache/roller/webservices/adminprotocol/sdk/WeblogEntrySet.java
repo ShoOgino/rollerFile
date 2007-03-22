@@ -16,12 +16,12 @@
 * directory of this distribution.
 */
 /*
- * UserEntrySet.java
+ * WeblogEntrySet.java
  *
  * Created on January 17, 2006, 12:44 PM
  */
 
-package org.apache.roller.webservices.adminapi.sdk;
+package org.apache.roller.webservices.adminprotocol.sdk;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,55 +32,52 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.apache.roller.webservices.adminapi.sdk.EntrySet.Types;
+import org.apache.roller.webservices.adminprotocol.sdk.EntrySet.Types;
 
 /**
- * This class describes a set of user entries. 
+ * This class describes a set of weblog entries. 
  * @author jtb
  */
-public class UserEntrySet extends EntrySet {
-    /** XML tags that describe a set of user entries. */
-    private static interface Tags {
-        public static final String USERS = "users";
-    }       
-        
-    /** Construct based on an array of Roller UserData objects. */
-    public UserEntrySet(String urlPrefix) {
-        setHref(urlPrefix + "/" + Types.USERS);
+public class WeblogEntrySet extends EntrySet {
+    static interface Tags {
+        public static final String WEBLOGS = "weblogs";
+    }      
+    
+    public WeblogEntrySet(String urlPrefix) {
+        setHref(urlPrefix + "/" + Types.WEBLOGS);
     }
     
-    /** Construct based on a JDOM Document object. */
-    public UserEntrySet(Document d, String urlPrefix) throws UnexpectedRootElementException {
+    public WeblogEntrySet(Document d, String urlPrefix) throws UnexpectedRootElementException {
         populate(d, urlPrefix);
     }
     
-    public UserEntrySet(InputStream stream, String urlPrefix) throws JDOMException, IOException, UnexpectedRootElementException {               
+    public WeblogEntrySet(InputStream stream, String urlPrefix) throws JDOMException, IOException, UnexpectedRootElementException {               
         SAXBuilder sb = new SAXBuilder();
         Document d = sb.build(stream);
 
         populate(d, urlPrefix);        
-    }        
+    }    
     
     private void populate(Document d, String urlPrefix) throws UnexpectedRootElementException {
         Element root = d.getRootElement();
         String rootName = root.getName();
-        if (!rootName.equals(Tags.USERS)) {
-            throw new UnexpectedRootElementException("ERROR: Unexpected root element", Tags.USERS, rootName);
+        if (!rootName.equals(Tags.WEBLOGS)) {
+            throw new UnexpectedRootElementException("ERROR: Unexpected root element", Tags.WEBLOGS, rootName);
         }
-        List users = root.getChildren(UserEntry.Tags.USER, NAMESPACE);
-        if (users != null) {
+        List weblogs = root.getChildren(WeblogEntry.Tags.WEBLOG, Service.NAMESPACE);
+        if (weblogs != null) {
             List entries = new ArrayList();
-            for (Iterator i = users.iterator(); i.hasNext(); ) {
-                Element user = (Element)i.next();
-                UserEntry entry = new UserEntry(user, urlPrefix);
+            for (Iterator i = weblogs.iterator(); i.hasNext(); ) {
+                Element weblog = (Element)i.next();
+                WeblogEntry entry = new WeblogEntry(weblog, urlPrefix);
                 entries.add(entry);
             }
             setEntries((Entry[])entries.toArray(new Entry[0]));
         }
-        setHref(urlPrefix + "/" + Types.USERS);
+        setHref(urlPrefix + "/" + Types.WEBLOGS);
     }    
-        
+       
     public String getType() {
-        return Types.USERS;
+        return Types.WEBLOGS;
     }    
 }

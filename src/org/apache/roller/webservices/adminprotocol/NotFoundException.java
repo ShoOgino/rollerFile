@@ -15,20 +15,20 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi;
+package org.apache.roller.webservices.adminprotocol;
 
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Indicates to client that an internal error occured when processing
- * the request.
+ * Indicates to client that the requested resource was not found
+ * on the server.
  */
-public class InternalException extends HandlerException { 
-    public InternalException(String msg, Throwable t) {
-        super(msg, t);
+public class NotFoundException extends HandlerException { 
+    public NotFoundException(String msg) {
+        super(msg);
     }    
     
     public int getStatus() {
-        return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        return HttpServletResponse.SC_NOT_FOUND;
     }
 }

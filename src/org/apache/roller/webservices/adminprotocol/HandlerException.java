@@ -15,19 +15,27 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.webservices.adminapi.sdk;
+package org.apache.roller.webservices.adminprotocol;
 
-public class UnexpectedRootElementException extends Exception {
-    private String expected;
-    private String actual;
-    
-    public UnexpectedRootElementException(String msg, String expected, String actual) {
+/**
+ * Abstract base class for all handler exceptions.
+ *
+ * Subclasses of this class allow handler implementations to indicate to
+ * callers a particular HTTP error type, while still providing
+ * a textual description of the problem.
+ * 
+ * Callers may use the 
+ * <code>getStatus()</code> method to discover the HTTP status
+ * code that should be returned to the client.
+ */
+public abstract class HandlerException extends Exception { 
+    public HandlerException(String msg) {
         super(msg);
-        this.expected = expected;
-        this.actual = actual;
-    }
-    
-    public String getMessage() {
-        return super.getMessage() + ": expected root element:  " + expected + ", was: " + actual;
     }    
+
+    public HandlerException(String msg, Throwable t) {
+        super(msg);
+    }    
+    
+    public abstract int getStatus();
 }
