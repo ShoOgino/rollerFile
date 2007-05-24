@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  The ASF licenses this file to You
@@ -15,133 +16,130 @@
  * copyright in this work, please see the NOTICE file in the top level
  * directory of this distribution.
  */
-
-package org.apache.roller.planet.business.hibernate;
+package org.apache.roller.business.jpa;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.roller.RollerException;
-import org.apache.roller.business.hibernate.HibernatePersistenceStrategy;
-import org.apache.roller.planet.business.AbstractManagerImpl;
-import org.apache.roller.planet.business.PropertiesManager;
-import org.apache.roller.planet.config.PlanetRuntimeConfig;
-import org.apache.roller.planet.config.runtime.ConfigDef;
-import org.apache.roller.planet.config.runtime.DisplayGroup;
-import org.apache.roller.planet.config.runtime.PropertyDef;
-import org.apache.roller.planet.config.runtime.RuntimeConfigDefs;
-import org.apache.roller.planet.pojos.PropertyData;
+
+import org.apache.roller.business.PropertiesManager;
+import org.apache.roller.business.Roller;
+import org.apache.roller.business.RollerFactory;
+import org.apache.roller.config.RollerRuntimeConfig;
+import org.apache.roller.config.runtime.ConfigDef;
+import org.apache.roller.config.runtime.DisplayGroup;
+import org.apache.roller.config.runtime.PropertyDef;
+import org.apache.roller.config.runtime.RuntimeConfigDefs;
+import org.apache.roller.pojos.RollerConfigData;
+import org.apache.roller.pojos.RollerPropertyData;
+import org.apache.roller.business.jpa.JPAPersistenceStrategy;
 
 
-/**
- * Hibernate implementation of the PropertiesManager.
+/*
+ * JPAPropertiesManagerImpl.java
+ *
+ * Created on May 29, 2006, 2:06 PM
+ *
  */
-public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
-        implements PropertiesManager {
+public class JPAPropertiesManagerImpl implements PropertiesManager {
     
-    private static Log log = LogFactory.getLog(HibernatePropertiesManagerImpl.class);
-    
-    private HibernatePersistenceStrategy strategy = null;
-    
+    /** The logger instance for this class. */
+    private static Log log = LogFactory.getLog(
+        JPAPropertiesManagerImpl.class);
+
+    private JPAPersistenceStrategy strategy;
     
     /**
-     * Creates a new instance of HibernatePropertiesManagerImpl
+     * Creates a new instance of JPAPropertiesManagerImpl
      */
-    public HibernatePropertiesManagerImpl(HibernatePersistenceStrategy strat) {
-        
-        log.debug("Instantiating Hibernate Properties Manager");
-        
-        this.strategy = strat;
-        
+    public JPAPropertiesManagerImpl (
+            JPAPersistenceStrategy strategy) {
+        log.debug("Instantiating JPA Properties Manager");
+
+        this.strategy = strategy;
+
         // TODO: and new method initialize(props)
         init();
     }
-    
-    
+
     /**
      * Retrieve a single property by name.
      */
-    public PropertyData getProperty(String name) throws RollerException {
-        try {
-            return (PropertyData) strategy.load(name, PropertyData.class);
-        } catch (HibernateException e) {
-            throw new RollerException(e);
-        }
+    public RollerPropertyData getProperty(String name) throws RollerException {
+        return (RollerPropertyData) strategy
+            .load(RollerPropertyData.class,name);
     }
-    
-    
+
+
     /**
      * Retrieve all properties.
      *
      * Properties are returned in a Map to make them easy to lookup.  The Map
-     * uses the property name as the key and the PropertyData object
+     * uses the property name as the key and the RollerPropertyData object
      * as the value.
      */
     public Map getProperties() throws RollerException {
-        
+
         HashMap props = new HashMap();
-        
-        try {
-            Session session = strategy.getSession();
-            Criteria criteria = session.createCriteria(PropertyData.class);
-            List list = criteria.list();
-            
-            /*
-             * for convenience sake we are going to put the list of props
-             * into a map for users to access it.  The value element of the
-             * hash still needs to be the PropertyData object so that
-             * we can save the elements again after they have been updated
-             */
-            PropertyData prop = null;
-            Iterator it = list.iterator();
-            while(it.hasNext()) {
-                prop = (PropertyData) it.next();
-                props.put(prop.getName(), prop);
-            }
-        } catch (HibernateException e) {
-            throw new RollerException(e);
+        List list = (List) strategy.getNamedQuery("RollerPropertyData.getAll").getResultList();
+        /*
+         * for convenience sake we are going to put the list of props
+         * into a map for users to access it.  The value element of the
+         * hash still needs to be the RollerPropertyData object so that
+         * we can save the elements again after they have been updated
+         */
+        RollerPropertyData prop = null;
+        Iterator it = list.iterator();
+        while(it.hasNext()) {
+            prop = (RollerPropertyData) it.next();
+            props.put(prop.getName(), prop);
         }
-        
+
         return props;
     }
-    
-    
+
+
     /**
      * Save a single property.
      */
-    public void saveProperty(PropertyData property) throws RollerException {
-        
+    public void saveProperty(RollerPropertyData property) 
+            throws RollerException {
         this.strategy.store(property);
     }
-    
-    
+
+
     /**
      * Save all properties.
      */
     public void saveProperties(Map properties) throws RollerException {
-        
+
         // just go through the list and saveProperties each property
         Iterator props = properties.values().iterator();
         while (props.hasNext()) {
-            this.strategy.store((PropertyData) props.next());
+            this.strategy.store((RollerPropertyData) props.next());
         }
     }
-    
-    
+
+
     private void init() {
         Map props = null;
         try {
             props = this.getProperties();
-            
-            // initialize any new props
-            props = initializeMissingProps(props);
-            
+
+            if(props.size() < 1) {
+                // empty props table ... load defaults
+                props = initializeMissingProps(props);
+            } else {
+                // found existing props ... check for new props
+                props = initializeMissingProps(props);
+            }
+
             // save our changes
             this.saveProperties(props);
         } catch (Exception e) {
@@ -149,10 +147,9 @@ public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
                     "Please check that the database has been upgraded!", e);
             throw new RuntimeException(e);
         }
-        
+
     }
-    
-    
+
     /**
      * This method compares the property definitions in the RuntimeConfigDefs
      * file with the properties in the given Map and initializes any properties
@@ -161,18 +158,18 @@ public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
      * If the Map of props is empty/null then we will initialize all properties.
      **/
     private Map initializeMissingProps(Map props) {
-        
+
         if(props == null)
             props = new HashMap();
-        
+
         // start by getting our runtimeConfigDefs
         RuntimeConfigDefs runtimeConfigDefs =
-                PlanetRuntimeConfig.getRuntimeConfigDefs();
-        
+                RollerRuntimeConfig.getRuntimeConfigDefs();
+
         // can't do initialization without our config defs
         if(runtimeConfigDefs == null)
             return props;
-        
+
         // iterator through all the definitions and add properties
         // that are not already in our props map
         ConfigDef configDef = null;
@@ -181,30 +178,36 @@ public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
         Iterator defs = runtimeConfigDefs.getConfigDefs().iterator();
         while(defs.hasNext()) {
             configDef = (ConfigDef) defs.next();
-            
+
             Iterator groups = configDef.getDisplayGroups().iterator();
             while(groups.hasNext()) {
                 dGroup = (DisplayGroup) groups.next();
-                
+
                 Iterator propdefs = dGroup.getPropertyDefs().iterator();
                 while(propdefs.hasNext()) {
                     propDef = (PropertyDef) propdefs.next();
-                    
+
                     // do we already have this prop?  if not then add it
                     if(!props.containsKey(propDef.getName())) {
-                        PropertyData newprop =
-                                new PropertyData(propDef.getName(), propDef.getDefaultValue());
-                        
+                        RollerPropertyData newprop =
+                            new RollerPropertyData(
+                                propDef.getName(), propDef.getDefaultValue());
+
                         props.put(propDef.getName(), newprop);
-                        
-                        log.info("Found uninitialized property "+propDef.getName()+
-                                " ... setting value to ["+propDef.getDefaultValue()+"]");
+
+                        log.info("Found uninitialized property " +
+                            propDef.getName() +
+                            " ... setting value to [" + 
+                            propDef.getDefaultValue() + "]");
                     }
                 }
             }
         }
-        
+
         return props;
     }
-    
+
+
+    public void release() {}
+
 }

@@ -16,19 +16,16 @@
  * directory of this distribution.
  */
 
-package org.apache.roller.planet.business.hibernate;
+package org.apache.roller.planet.business.jpa;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.roller.RollerException;
-import org.apache.roller.business.hibernate.HibernatePersistenceStrategy;
+import org.apache.roller.business.jpa.JPAPersistenceStrategy;
 import org.apache.roller.planet.business.AbstractManagerImpl;
 import org.apache.roller.planet.business.PropertiesManager;
 import org.apache.roller.planet.config.PlanetRuntimeConfig;
@@ -42,20 +39,19 @@ import org.apache.roller.planet.pojos.PropertyData;
 /**
  * Hibernate implementation of the PropertiesManager.
  */
-public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
-        implements PropertiesManager {
+public class JPAPropertiesManagerImpl  extends AbstractManagerImpl implements PropertiesManager {
     
-    private static Log log = LogFactory.getLog(HibernatePropertiesManagerImpl.class);
+    private static Log log = LogFactory.getLog(JPAPropertiesManagerImpl.class);
     
-    private HibernatePersistenceStrategy strategy = null;
+    private JPAPersistenceStrategy strategy = null;
     
     
     /**
-     * Creates a new instance of HibernatePropertiesManagerImpl
+     * Creates a new instance of JPAPropertiesManagerImpl
      */
-    public HibernatePropertiesManagerImpl(HibernatePersistenceStrategy strat) {
+    public JPAPropertiesManagerImpl(JPAPersistenceStrategy strat) {
         
-        log.debug("Instantiating Hibernate Properties Manager");
+        log.debug("Instantiating JPA Properties Manager");
         
         this.strategy = strat;
         
@@ -68,11 +64,7 @@ public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
      * Retrieve a single property by name.
      */
     public PropertyData getProperty(String name) throws RollerException {
-        try {
-            return (PropertyData) strategy.load(name, PropertyData.class);
-        } catch (HibernateException e) {
-            throw new RollerException(e);
-        }
+        return (PropertyData)strategy.load(PropertyData.class, name);
     }
     
     
@@ -86,26 +78,19 @@ public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
     public Map getProperties() throws RollerException {
         
         HashMap props = new HashMap();
+        List list = strategy.getNamedQuery("PropertyData.getAll").getResultList();
         
-        try {
-            Session session = strategy.getSession();
-            Criteria criteria = session.createCriteria(PropertyData.class);
-            List list = criteria.list();
-            
-            /*
-             * for convenience sake we are going to put the list of props
-             * into a map for users to access it.  The value element of the
-             * hash still needs to be the PropertyData object so that
-             * we can save the elements again after they have been updated
-             */
-            PropertyData prop = null;
-            Iterator it = list.iterator();
-            while(it.hasNext()) {
-                prop = (PropertyData) it.next();
-                props.put(prop.getName(), prop);
-            }
-        } catch (HibernateException e) {
-            throw new RollerException(e);
+        /*
+         * for convenience sake we are going to put the list of props
+         * into a map for users to access it.  The value element of the
+         * hash still needs to be the PropertyData object so that
+         * we can save the elements again after they have been updated
+         */
+        PropertyData prop = null;
+        Iterator it = list.iterator();
+        while(it.hasNext()) {
+            prop = (PropertyData) it.next();
+            props.put(prop.getName(), prop);
         }
         
         return props;
@@ -117,7 +102,7 @@ public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
      */
     public void saveProperty(PropertyData property) throws RollerException {
         
-        this.strategy.store(property);
+        strategy.store(property);
     }
     
     
@@ -129,7 +114,7 @@ public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
         // just go through the list and saveProperties each property
         Iterator props = properties.values().iterator();
         while (props.hasNext()) {
-            this.strategy.store((PropertyData) props.next());
+            strategy.store((PropertyData) props.next());
         }
     }
     
@@ -206,5 +191,8 @@ public class HibernatePropertiesManagerImpl extends AbstractManagerImpl
         
         return props;
     }
+    
+    
+    public void release() {}
     
 }

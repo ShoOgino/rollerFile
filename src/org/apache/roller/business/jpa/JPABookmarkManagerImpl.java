@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  The ASF licenses this file to You
@@ -15,104 +16,112 @@
  * copyright in this work, please see the NOTICE file in the top level
  * directory of this distribution.
  */
-
-package org.apache.roller.business.hibernate;
+package org.apache.roller.business.jpa;
 
 import java.io.StringReader;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.criterion.Expression;
+import java.util.Iterator;
+import java.util.List;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.roller.RollerException;
+import org.apache.roller.business.BookmarkManager;
+import org.apache.roller.business.RollerFactory;
 import org.apache.roller.pojos.BookmarkData;
 import org.apache.roller.pojos.FolderData;
 import org.apache.roller.pojos.WebsiteData;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-import org.apache.roller.business.BookmarkManager;
-import org.apache.roller.business.RollerFactory;
-import org.apache.roller.util.Utilities;
 
-
-/**
- * Hibernate implementation of the BookmarkManager.
+/*
+ * JPABookmarkManagerImpl.java
+ *
+ * Created on May 31, 2006, 3:49 PM
+ *
  */
-public class HibernateBookmarkManagerImpl implements BookmarkManager {
+public class JPABookmarkManagerImpl implements BookmarkManager {
     
-    static final long serialVersionUID = 5286654557062382772L;
-    
-    private static Log log = LogFactory.getLog(HibernateBookmarkManagerImpl.class);
-    
-    private HibernatePersistenceStrategy strategy = null;
-    
+    private JPAPersistenceStrategy strategy;
     
     /**
-     * @param pstrategy
-     * @param roller
+     * The logger instance for this class.
      */
-    public HibernateBookmarkManagerImpl(HibernatePersistenceStrategy strat) {
-        log.debug("Instantiating Hibernate Bookmark Manager");
-        
-        this.strategy = strat;
+    private static Log log = LogFactory
+            .getFactory().getInstance(JPABookmarkManagerImpl.class);
+
+    /**
+     * Creates a new instance of JPABookmarkManagerImpl
+     */
+    public JPABookmarkManagerImpl 
+            (JPAPersistenceStrategy strategy) {
+        log.debug("Instantiating JPA Bookmark Manager");
+
+        this.strategy = strategy;
     }
-    
-    
+
     public void saveBookmark(BookmarkData bookmark) throws RollerException {
+        boolean exists = getBookmark(bookmark.getId()) != null;        
+        if (!exists) {
+            // New object make sure that relationship is set on managed copy of other side
+            bookmark.getFolder().getBookmarks().add(bookmark);
+        }
+
         this.strategy.store(bookmark);
-        
-        // update weblog last modified date.  date updated by saveWebsite()
-        RollerFactory.getRoller().getUserManager().saveWebsite(bookmark.getWebsite());
+
+        // update weblog last modified date (date is updated by saveWebsite())
+        RollerFactory.getRoller().getUserManager().
+            saveWebsite(bookmark.getWebsite());
     }
-    
-    
+
     public BookmarkData getBookmark(String id) throws RollerException {
-        BookmarkData bd = (BookmarkData)
-        strategy.load(id, BookmarkData.class);
-        // TODO: huh?  why do we do this?
-        if (bd != null) bd.setBookmarkManager(this);
-        return bd;
+        return (BookmarkData) strategy.load(BookmarkData.class, id);
     }
-    
-    
+
     public void removeBookmark(BookmarkData bookmark) throws RollerException {
-        //Remove the bookmark from its parent folder
-        bookmark.getFolder().getBookmarks().remove(bookmark);
         //Now remove it from database
         this.strategy.remove(bookmark);
+        //Remove the bookmark from its parent folder
+        bookmark.getFolder().getBookmarks().remove(bookmark);
         // update weblog last modified date.  date updated by saveWebsite()
         RollerFactory.getRoller().getUserManager()
                 .saveWebsite(bookmark.getWebsite());
     }
-    
-    
+
     public void saveFolder(FolderData folder) throws RollerException {
         
-        FolderData existingFolder = getFolder(folder.getId());        
-        if(existingFolder == null && isDuplicateFolderName(folder)) {
-            throw new RollerException("Duplicate folder name");
+        if(folder.getId() == null || this.getFolder(folder.getId()) == null) {
+            // New folder, so make sure name is unique
+            if (isDuplicateFolderName(folder)) {
+                throw new RollerException("Duplicate folder name");
+            }
+
+            // And If it has a parent, maintain relationship from both sides
+            FolderData parent = folder.getParent();
+            if(parent != null) {
+                parent.getFolders().add(folder);
+            }
         }
-        
+
         this.strategy.store(folder);
-        
+
         // update weblog last modified date.  date updated by saveWebsite()
         RollerFactory.getRoller().getUserManager().saveWebsite(folder.getWebsite());
     }
-    
-    
+
     public void removeFolder(FolderData folder) throws RollerException {
-        
         this.strategy.remove(folder);
-        
+        FolderData parent = folder.getParent();
+        if (parent != null) {
+            parent.getFolders().remove(folder);
+        }
+
         // update weblog last modified date.  date updated by saveWebsite()
-        RollerFactory.getRoller().getUserManager().saveWebsite(folder.getWebsite());
+        RollerFactory.getRoller().getUserManager().
+            saveWebsite(folder.getWebsite());
     }
-    
     
     public void moveFolder(FolderData srcFolder, FolderData destFolder)
             throws RollerException {
@@ -123,9 +132,17 @@ public class HibernateBookmarkManagerImpl implements BookmarkManager {
                     "ERROR cannot move parent folder into it's own child");
         }
         
-        log.debug("Moving folder "+srcFolder.getPath()+" under "+destFolder.getPath());
+        log.debug("Moving folder " + srcFolder.getPath() + " under " +
+            destFolder.getPath());
         
+        // Manage relationships
+        FolderData oldParent = srcFolder.getParent();
+        if(oldParent != null) {
+            oldParent.getFolders().add(srcFolder);
+        }
         srcFolder.setParent(destFolder);
+        destFolder.getFolders().add(srcFolder);
+        
         if("/".equals(destFolder.getPath())) {
             srcFolder.setPath("/"+srcFolder.getName());
         } else {
@@ -135,35 +152,64 @@ public class HibernateBookmarkManagerImpl implements BookmarkManager {
         
         // the main work to be done for a category move is to update the 
         // path attribute of the category and all descendent categories
-        FolderData.updatePathTree(srcFolder);
+        updatePathTree(srcFolder);
+    }    
+
+    // updates the paths of all descendents of the given folder
+    private void updatePathTree(FolderData folder) throws RollerException {
+        
+        log.debug("Updating path tree for folder "+folder.getPath());
+        
+        FolderData childFolder = null;
+        Iterator childFolders = folder.getFolders().iterator();
+        while(childFolders.hasNext()) {
+            childFolder = (FolderData) childFolders.next();
+            
+            log.debug("OLD child folder path was "+childFolder.getPath());
+            
+            // update path and save
+            if("/".equals(folder.getPath())) {
+                childFolder.setPath("/" + childFolder.getName());
+            } else {
+                childFolder.setPath(folder.getPath() + "/" + 
+                    childFolder.getName());
+            }
+            saveFolder(childFolder);
+            
+            log.debug("NEW child folder path is "+ childFolder.getPath());
+            
+            // then make recursive call to update this folders children
+            updatePathTree(childFolder);
+        }
     }
-    
+
     
     /**
      * Retrieve folder and lazy-load it's sub-folders and bookmarks.
      */
     public FolderData getFolder(String id) throws RollerException {
-        return (FolderData)strategy.load(id, FolderData.class);
+        return (FolderData) strategy.load(FolderData.class, id);
     }
+
     
-    
-    public void importBookmarks(WebsiteData website, String folderName, String opml)
+    public void importBookmarks(
+            WebsiteData website, String folderName, String opml)
             throws RollerException {
-        
         String msg = "importBookmarks";
         try {
             // Build JDOC document OPML string
             SAXBuilder builder = new SAXBuilder();
             StringReader reader = new StringReader( opml );
             Document doc = builder.build( reader );
-            
+
             FolderData newFolder = getFolder(website, folderName);
             if (newFolder == null) {
                 newFolder = new FolderData(
-                        getRootFolder(website), folderName, folderName, website);
+                        getRootFolder(website), 
+                        folderName, folderName, website);
                 this.strategy.store(newFolder);
             }
-            
+
             // Iterate through children of OPML body, importing each
             Element body = doc.getRootElement().getChild("body");
             Iterator iter = body.getChildren().iterator();
@@ -171,14 +217,15 @@ public class HibernateBookmarkManagerImpl implements BookmarkManager {
                 Element elem = (Element)iter.next();
                 importOpmlElement( website, elem, newFolder );
             }
-            
+
         } catch (Exception ex) {
             throw new RollerException(ex);
         }
     }
-    
+
     // convenience method used when importing bookmarks
-    // NOTE: this method does not commit any changes, that is done by importBookmarks()
+    // NOTE: this method does not commit any changes; 
+    // that is done by importBookmarks()
     private void importOpmlElement(
             WebsiteData website, Element elem, FolderData parent)
             throws RollerException {
@@ -189,18 +236,21 @@ public class HibernateBookmarkManagerImpl implements BookmarkManager {
         //String type = elem.getAttributeValue("type");
         String xmlUrl = elem.getAttributeValue("xmlUrl");
         String htmlUrl = elem.getAttributeValue("htmlUrl");
-        
+
         title =   null!=title ? title : text;
         desc =    null!=desc ? desc : title;
         xmlUrl =  null!=xmlUrl ? xmlUrl : url;
         url =     null!=htmlUrl ? htmlUrl : url;
-        
+
         if (elem.getChildren().size()==0) {
             // Leaf element.  Store a bookmark
-            // Currently bookmarks must have at least a name and HTML url to be stored. Previous logic was
-            // trying to skip invalid ones, but was letting ones with an xml url and no html url through
+            // Currently bookmarks must have at least a name and 
+            // HTML url to be stored. Previous logic was
+            // trying to skip invalid ones, but was letting ones 
+            // with an xml url and no html url through
             // which could result in a db exception.
-            // TODO: Consider providing error feedback instead of silently skipping the invalid bookmarks here.
+            // TODO: Consider providing error feedback instead of 
+            // silently skipping the invalid bookmarks here.
             if (null != title && null != url) {
                 BookmarkData bd = new BookmarkData(parent,
                         title,
@@ -222,7 +272,7 @@ public class HibernateBookmarkManagerImpl implements BookmarkManager {
                     desc,
                     parent.getWebsite());
             this.strategy.store(fd);
-            
+
             // Import folder's children
             Iterator iter = elem.getChildren("outline").iterator();
             while ( iter.hasNext() ) {
@@ -231,104 +281,91 @@ public class HibernateBookmarkManagerImpl implements BookmarkManager {
             }
         }
     }
-    
-    
+
+
     public FolderData getFolder(WebsiteData website, String path)
             throws RollerException {
-        
+
         if (path == null || path.trim().equals("/")) {
             return getRootFolder(website);
         } else {
             String folderPath = path;
-            
+
             // all folder paths must begin with a '/'
             if(!folderPath.startsWith("/")) {
                 folderPath = "/"+folderPath;
             }
-            
+
             // now just do simple lookup by path
-            Session session = ((HibernatePersistenceStrategy)this.strategy).getSession();
-            
-            Criteria criteria = session.createCriteria(FolderData.class);
-            criteria.add(Expression.eq("website", website));
-            criteria.add(Expression.eq("path", folderPath));
-            
-            return (FolderData) criteria.uniqueResult();
+            Query query = strategy.getNamedQuery("FolderData.getByWebsite&Path");
+            query.setParameter(1, website);
+            query.setParameter(2, folderPath);
+            try {
+                return (FolderData)query.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
+            }
         }
     }
-    
-    
+
     /**
      * @see org.apache.roller.model.BookmarkManager#retrieveBookmarks(
      *      org.apache.roller.pojos.FolderData, boolean)
      */
-    public List getBookmarks(FolderData folder, boolean subfolders)
+    public List getBookmarks(FolderData folder, boolean subfolders) 
             throws RollerException {
-        
-        try {
-            Session session = ((HibernatePersistenceStrategy)this.strategy).getSession();
-            Criteria criteria = session.createCriteria(BookmarkData.class);
-            
-            if(!subfolders) {
-                // if no subfolders then this is an equals query
-                criteria.add(Expression.eq("folder", folder));
-            } else {
-                // if we are doing subfolders then do a case sensitive
-                // query using folder path
-                criteria.createAlias("folder", "fd");
-                criteria.add(Expression.like("fd.path", folder.getPath()+"%"));
-                criteria.add(Expression.eq("fd.website", folder.getWebsite()));
-            }
-            
-            return criteria.list();
-            
-        } catch (HibernateException e) {
-            throw new RollerException(e);
+        Query query = null;
+        List results = null;
+
+        if(!subfolders) {
+            // if no subfolders then this is an equals query
+            query = strategy.getNamedQuery("BoomarkData.getByFolder");
+            query.setParameter(1, folder);
+            results = query.getResultList();
+        } else {
+            // if we are doing subfolders then do a case sensitive
+            // query using folder path
+            query = strategy.getNamedQuery( 
+                "BoomarkData.getByFolder.pathLike&Folder.website");
+            query.setParameter(1, folder.getPath() + '%');
+            query.setParameter(2, folder.getWebsite());
+            results = query.getResultList();
         }
+            
+        return results;
     }
-    
-    
-    public FolderData getRootFolder(WebsiteData website) throws RollerException {
-        
+
+    public FolderData getRootFolder(WebsiteData website)
+            throws RollerException {
         if (website == null)
             throw new RollerException("website is null");
         
+        Query q = strategy.getNamedQuery("FolderData.getByWebsite&ParentNull");
+        q.setParameter(1, website);
         try {
-            Session session = ((HibernatePersistenceStrategy)this.strategy).getSession();
-            Criteria criteria = session.createCriteria(FolderData.class);
-            
-            criteria.add(Expression.eq("website", website));
-            criteria.add(Expression.isNull("parent"));
-            criteria.setMaxResults(1);
-            
-            return (FolderData) criteria.uniqueResult();
-            
-        } catch (HibernateException e) {
-            throw new RollerException(e);
+            return (FolderData)q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         }
     }
-    
-    public List getAllFolders(WebsiteData website) throws RollerException {
+
+    public List getAllFolders(WebsiteData website)
+            throws RollerException {
         if (website == null)
             throw new RollerException("Website is null");
         
-        try {
-            Session session = ((HibernatePersistenceStrategy) strategy).getSession();
-            Criteria criteria = session.createCriteria(FolderData.class);
-            criteria.add(Expression.eq("website", website));
-            return criteria.list();
-        } catch (HibernateException e) {
-            throw new RollerException(e);
-        }
-        
+        Query q = strategy.getNamedQuery("FolderData.getByWebsite");
+        q.setParameter(1, website);
+        return q.getResultList();
     }
-    
+
     
     /**
      * make sure the given folder doesn't already exist.
      */
-    private boolean isDuplicateFolderName(FolderData folder) throws RollerException {
-        
+    private boolean isDuplicateFolderName(FolderData folder) 
+        throws RollerException {
+
         // ensure that no sibling categories share the same name
         FolderData parent = folder.getParent();
         if (null != parent) {
@@ -337,8 +374,8 @@ public class HibernateBookmarkManagerImpl implements BookmarkManager {
         
         return false;
     }
-    
-    
+
+
     public void release() {}
     
 }
