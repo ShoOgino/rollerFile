@@ -15,15 +15,24 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
+
 package org.apache.roller.weblogger.webservices.atomprotocol;
 
-import com.sun.syndication.feed.module.Module;
-import java.util.Date;
+import com.sun.syndication.propono.atom.server.AtomHandlerFactory;
+import com.sun.syndication.propono.atom.server.AtomHandler;
+import javax.servlet.http.HttpServletRequest;
 
-public interface AppModule extends Module {
-    public static final String URI = "http://www.w3.org/2007/app";
-    public boolean getDraft();
-    public void setDraft(boolean draft);
-    public Date getEdited();
-    public void setEdited(Date edited);
+/**
+ * Extends {@link com.sun.syndication.propono.atom.server.AtomHandlerFactory} to create and return 
+ * {@link com.sun.syndication.propono.atom.server.impl.FileBasedAtomHandler}.
+ */
+public class RollerAtomHandlerFactory extends AtomHandlerFactory {
+    
+    /**
+     * Create new AtomHandler.
+     */
+    public AtomHandler newAtomHandler( HttpServletRequest req ) {
+        return new RollerAtomHandler(req);
+    }    
 }
+      

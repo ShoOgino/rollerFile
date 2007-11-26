@@ -15,27 +15,32 @@
 * copyright in this work, please see the NOTICE file in the top level
 * directory of this distribution.
 */
-package org.apache.roller.weblogger.webservices.atomprotocol;
 
-import javax.servlet.http.HttpServletResponse;
+package org.apache.roller.weblogger.ui.core;
+
+import javax.servlet.ServletContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
- * Exception thrown by AtomHandler in case of 404.
+ * Initialize the Roller web application/context for container managed
+ * authentication.
+ *
+ * @author Shing Wai Chan
  */
-public class AtomNotFoundException extends AtomException {
-    public AtomNotFoundException() {
+public class CmaRollerContext extends RollerContext { 
+    
+    private static Log log = LogFactory.getLog(CmaRollerContext.class);
+    
+    public CmaRollerContext() {
         super();
     }
-    public AtomNotFoundException(String msg) {
-        super(msg);
-    }
-    public AtomNotFoundException(String msg, Throwable t) {
-        super(msg, t);
-    }
-    public AtomNotFoundException(Throwable t) {
-        super(t);
-    }
-    public int getStatus() {
-        return HttpServletResponse.SC_NOT_FOUND;
+    
+    /**
+     * Setup Acegi security features.
+     */
+    protected void initializeSecurityFeatures(ServletContext context) { 
+        // no need to setup Acegi security
     }
 }
