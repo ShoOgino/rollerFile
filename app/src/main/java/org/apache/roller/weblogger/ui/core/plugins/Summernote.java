@@ -18,14 +18,13 @@
 
 package org.apache.roller.weblogger.ui.core.plugins;
 
-
 /**
- * A rich text WYSIWYG editor using Xinha.
+ * Summernote rich text editor
  */
-public class XinhaEditor implements WeblogEntryEditor {
-    
-    
-    public XinhaEditor() {}
+public class Summernote implements WeblogEntryEditor {
+
+
+    public Summernote() {}
     
     
     public String getId() {
@@ -33,7 +32,7 @@ public class XinhaEditor implements WeblogEntryEditor {
     }
     
     public String getName() {
-        return "editor.xinha.name";
+        return "editor.summernote.name";
     }
     
     public String getJspPage() {
